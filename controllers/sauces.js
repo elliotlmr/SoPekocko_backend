@@ -45,6 +45,6 @@ exports.getOneSauce = (req, res, next) => {
 
 exports.getAllSauces = (req, res, next) => {
     Sauce.find()
-    .then(sauces => res.status(200).json(sauces))
+    .then(sauces => res.status(200).json(sauces)) //sauces ou Sauces ?
     .catch(error => res.status(400).json({error}));
 };
