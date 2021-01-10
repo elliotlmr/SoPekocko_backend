@@ -4,6 +4,7 @@ const fs = require('fs');
 exports.createSauce = (req, res, next) => {
     const sauceObject = JSON.parse(req.body.sauce);
     delete sauceObject._id;
+    // Control validation -------------------------------------------
     const sauce = new Sauce({
         ...sauceObject,
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
@@ -48,3 +49,11 @@ exports.getAllSauces = (req, res, next) => {
     .then(sauces => res.status(200).json(sauces)) //sauces ou Sauces ?
     .catch(error => res.status(400).json({error}));
 };
+
+/*exports.modifySauce = (req, res, next) => {
+    Sauce.findOne({ _id: req.params.id })
+    .then(sauce => {
+
+    })
+    .catch();
+};*/
