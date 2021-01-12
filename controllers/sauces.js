@@ -59,16 +59,16 @@ exports.modifyLike = (req, res, next) => {
                 sauce[liked == 1 ? likes : dislikes] += 1;
                 sauce[liked == 1 ? usersLiked : userDisliked].push(req.body.userId);
                 if (sauce.usersLiked.includes(req.body.userId)) {
-                    sauce.userLiked.remove(req.body.userId);
+                    sauce.userLiked.filter(user => user != req.body.userId);
                     sauce.likes -= 1;
                 }
                 if (sauce.usersDisiked.includes(req.body.userId)) {
-                    sauce.userDisliked.remove(req.body.userId);
+                    sauce.userDisliked.filter(user => user != req.body.userId);
                     sauce.dislikes -= 1;
                 }
             } else {
                 sauce[usersLiked.includes(req.body.userId) ? likes : dislikes] -= 1;
-                sauce[usersLiked.includes(req.body.userId) ? usersLiked : usersDisiked].remove(req.body.userId);
+                sauce[usersLiked.includes(req.body.userId) ? usersLiked : usersDisiked].filter(user => user != req.body.userId);
             };
             Sauce.updateOne({ _id: req.params.id }, sauce)
                 .then(() => res.status(200).json({ message: 'Objet modifié like/dislike !' }))
