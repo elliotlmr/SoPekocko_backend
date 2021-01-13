@@ -55,6 +55,82 @@ exports.modifyLike = (req, res, next) => {
     const liked = req.body.like;
     Sauce.findOne({ _id: req.params.id })
         .then(sauce => {
+            const likes = sauce.likes;
+            const dislikes = sauce.dislikes;
+            const usersLiked = sauce.usersLiked;
+            const usersDisliked = sauce.usersDisliked;
+            if (liked == 1 || liked == -1) {
+                sauce[liked == 1 ? likes : dislikes] += 1;
+                sauce[liked == 1 ? usersLiked.push(req.body.userId) : usersDisliked.push(req.body.userId)];
+                /*sauce[liked == 1 && sauce.usersLiked.includes(req.body.userId) ? ]
+                if (sauce.usersLiked.includes(req.body.userId)) {
+                    sauce.usersLiked.filter(user => user != req.body.userId);
+                    sauce.likes -= 1;
+                }
+                if (sauce.usersDisliked.includes(req.body.userId)) {
+                    sauce.usersDisliked.filter(user => user != req.body.userId);
+                    sauce.dislikes -= 1;
+                }*/
+            } else {
+                if (sauce.usersLiked.includes(req.body.userId)) {
+                    sauce.likes -= 1;
+                    sauce.usersLiked.filter(user => user != req.body.userId);
+                };
+                if (sauce.usersDisliked.includes(req.body.userId)) {
+                    sauce.dislikes -= 1;
+                    sauce.usersDisliked.filter(user => user != req.body.userId);
+                };
+                /*sauce[sauce.usersLiked.includes(req.body.userId) ? likes : dislikes] -= 1;
+                sauce[sauce.usersLiked.includes(req.body.userId) ? usersLiked : usersDisliked].filter(user => user != req.body.userId);
+                */
+            };
+            Sauce.updateOne({ _id: req.params.id }, sauce)
+                .then(() => res.status(200).json({ message: 'Objet modifié like/dislike !' }))
+                .catch(error => console.log(error));
+                res.status(400).json({ message: 'Impossible de modifier les likes' });
+        })
+        .catch(error => console.log(error));
+        res.status(400).json({ message: 'Impossible de like/dislike' });
+};
+
+/*exports.modifyLike = (req, res, next) => {
+    const liked = req.body.like;
+    if (liked == 1 || liked == -1) {
+        Sauce.findOne({ _id: req.params.id })
+            .then(sauce => {
+                sauce[liked == 1 ? likes : dislikes] += 1;
+                sauce[liked == 1 ? usersLiked : userDisliked].push(req.body.userId);
+                if (sauce.usersLiked.includes(req.body.userId)) {
+                    sauce.userLiked.filter(user => user != req.body.userId);
+                    sauce.likes -= 1;
+                }
+                if (sauce.usersDisiked.includes(req.body.userId)) {
+                    sauce.userDisliked.filter(user => user != req.body.userId);
+                    sauce.dislikes -= 1;
+                }
+                Sauce.updateOne({ _id: req.params.id }, sauce)
+                    .then(() => res.status(200).json({ message: 'Objet modifié like/dislike !' }))
+                    .catch(error => res.status(400).json({ message: 'Impossible de modifier les likes' }));
+            })
+            .catch(error => res.status(400).json({ error }));
+    } else {
+        Sauce.findOne({ _id: req.params.id })
+            .then(sauce => {
+                sauce[usersLiked.includes(req.body.userId) ? likes : dislikes] -= 1;
+                sauce[usersLiked.includes(req.body.userId) ? usersLiked : usersDisiked].filter(user => user != req.body.userId);
+                Sauce.updateOne({ _id: req.params.id }, sauce)
+                    .then(() => res.status(200).json({ message: 'Objet modifié like/dislike !' }))
+                    .catch(error => res.status(400).json({ message: 'Impossible de modifier les likes' }));
+            })
+            .catch(error => res.status(400).json({ error }));
+    };
+};
+
+
+/*exports.modifyLike = (req, res, next) => {
+    const liked = req.body.like;
+    Sauce.findOne({ _id: req.params.id })
+        .then(sauce => {
             if (liked == 1 || liked == -1) {
                 sauce[liked == 1 ? likes : dislikes] += 1;
                 sauce[liked == 1 ? usersLiked : userDisliked].push(req.body.userId);
@@ -73,10 +149,13 @@ exports.modifyLike = (req, res, next) => {
             Sauce.updateOne({ _id: req.params.id }, sauce)
                 .then(() => res.status(200).json({ message: 'Objet modifié like/dislike !' }))
                 .catch(error => res.status(400).json({ message: 'Impossible de modifier les likes' }));
+            console.log(sauce, error)
         })
         .catch(error => res.status(400).json({ message: 'Impossible de like/dislike' }));
 };
-/*exports.modifyLike = (req, res, next) => {
+
+
+exports.modifyLike = (req, res, next) => {
     const sauceObject = req.file ?
         {
             ...JSON.parse(req.body.sauce),
