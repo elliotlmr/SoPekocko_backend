@@ -1,5 +1,4 @@
 const Sauce = require('../models/Sauce');
-const User = require('../models/User');
 const fs = require('fs');
 
 exports.createSauce = (req, res, next) => {
@@ -56,25 +55,21 @@ exports.modifyLike = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id })
         .then(sauce => {
             if (liked == 1 || liked == -1) {
-                liked == 1 ? (
-                    sauce.likes += 1, 
-                    sauce.usersLiked.push(req.body.userId)
-                ) : (
-                    sauce.dislikes += 1, 
-                    sauce.usersDisliked.push(req.body.userId)
-                );
+                sauce[ liked == 1 ? 'likes' : 'dislikes' ] += 1;
+                sauce[ liked == 1 ? 'usersLiked' : 'usersDisliked' ].push(req.body.userId);  
             } else {
-                sauce.usersLiked.includes(req.body.userId) ? (
-                    sauce.likes -= 1,
-                    sauce.usersLiked.filter(user => user !== req.body.userId)
-                ) : (
-                    sauce.dislikes -= 1,
-                    sauce.usersDisliked.filter(user => user !== req.body.userId)
-                );
+                if (sauce.usersLiked.includes(req.body.userId)) {
+                    sauce.likes -= 1;
+                    sauce.usersLiked = sauce.usersLiked.filter(user => user != req.body.userId);
+                };
+                if (sauce.usersDisliked.includes(req.body.userId)) {
+                    sauce.dislikes -= 1;
+                    sauce.usersDisliked = sauce.usersDisliked.filter(user => user != req.body.userId);
+                };
             };
             Sauce.updateOne({ _id: req.params.id }, sauce)
                 .then(() => res.status(200).json({ message: 'Objet modifié like/dislike !' }))
                 .catch(error => console.log(error));
         })
-        .catch(error => console.log(error));
+        .catch(error => res.status(400).json({ error }));
 };
