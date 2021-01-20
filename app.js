@@ -3,10 +3,16 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const path = require('path');
 
+// Environment variables
+const dotenv = require('dotenv');
+dotenv.config();
+const uri = process.env.ATLAS_URI;
+
 const authRoutes = require('./routes/users');
 const saucesRoutes = require('./routes/sauces');
 
-mongoose.connect('mongodb+srv://lmr_customers:x8u8L5YkWN6K52eK@cluster.gug17.mongodb.net/piquante?retryWrites=true&w=majority',
+
+mongoose.connect(uri,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
